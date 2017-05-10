@@ -1,0 +1,110 @@
+<html>
+    <style>
+        
+        body {
+	    background-color: #000;
+	    margin: 0px;
+	    overflow: hidden;
+        }
+    
+    </style>
+
+    <body>
+
+        <script src="three.min.js"></script>
+        <script src="OrbitControls.js"></script>
+        <script>
+
+            var renderer, scene, camera, controls, light, then, now, delta, mesh, geometry, geometry2;
+            var material, geo, geo2, mat, wireframe, wireframe2
+            var interval = 1000/60;
+            var k = 0;
+
+            init();
+            animate();
+
+            function init() {
+
+                //Instantiate a WebGLRenderer.
+                renderer = new THREE.WebGLRenderer();
+                renderer.setSize( window.innerWidth, window.innerHeight );
+                document.body.appendChild( renderer.domElement );
+
+                //Instantiate a scene.
+                scene = new THREE.Scene();
+    
+                //Add a camera.
+                camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+                camera.position.set( 20, 20, 20 );
+
+                //Mouse controls.
+                controls = new THREE.OrbitControls( camera );
+    
+	        light = new THREE.HemisphereLight( 0xeeeeee, 0x888888, 1 );
+	        light.position.set( 0, 20, 0 );
+	        scene.add( light );
+    
+                //Add axes.
+                scene.add( new THREE.AxisHelper( 20 ) );
+
+                //Construct the geometry with a material.
+                geometry = new THREE.SphereGeometry( 10, 12, 8 );
+                geometry2 = new THREE.SphereGeometry(6,12,8);
+    
+                material = new THREE.MeshPhongMaterial( {
+                  color: 0x000000, 
+                  transparent:true,
+                  opacity:0.5,
+                  shading: THREE.FlatShading,
+                  polygonOffset: true,
+                  polygonOffsetFactor: 1, // positive value pushes polygon further away
+                  polygonOffsetUnits: 1
+                } );
+    
+                //Instantiate the two meshes for the two 'crystals'.
+                mesh = new THREE.Mesh( geometry, material );
+                mesh2 = new THREE.Mesh( geometry2, material);
+                scene.add(mesh, mesh2 );
+                
+                //Two geometries.
+                geo = new THREE.EdgesGeometry(geometry);
+                geo2 = new THREE.EdgesGeometry(geometry2);
+
+                mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2 } );
+
+                wireframe = new THREE.LineSegments( geo, mat );
+                wireframe2 = new THREE.LineSegments( geo2, mat);
+                
+                //Construct the two 'crystals'.
+                mesh.add( wireframe);
+                mesh2.add(wireframe2);
+            }
+
+
+            then = Date.now();
+            animate();
+
+            function animate() {        //Perform the animation, newly creating the box each time.
+
+                now = Date.now();
+                delta = now - then;
+
+                if (delta > interval)  {  //This is to control the speed of the box across the screen.
+
+                    mesh.rotateX(0.005);
+                    mesh2.rotateX(-0.005);
+                    renderer.render( scene, camera );
+
+                    then = now -(delta % interval);
+
+                    k++;   //Increase the translation distance by 1 pixel more each time.
+                }
+
+                requestAnimationFrame( animate );
+            }
+
+</script>
+</body>
+</html>
+
+
